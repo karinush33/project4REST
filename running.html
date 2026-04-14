@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Run-Predictor AI | Pro Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Assistant:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Assistant', sans-serif;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* רקע דינמי - חלקיקי נתונים */
+        .bg-animate {
+            position: fixed; inset: 0; z-index: -1;
+            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.2;
+        }
+
+        /* סרגל ניווט עליון לניהול */
+        .top-nav {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        .admin-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 30px;
+            background: var(--glass);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-link:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+            background: rgba(0, 210, 255, 0.1);
+        }
+
+        .header {
+            padding: 60px 20px 40px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(15,23,42,1), transparent);
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 3rem;
+            letter-spacing: -2px;
+            margin: 0;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* כרטיסי זכוכית */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* תצוגת תוצאה מרהיבה */
+        .prediction-display {
+            display: none;
+            margin-top: 30px;
+            padding: 40px;
+            background: rgba(0, 210, 255, 0.05);
+            border: 1px solid var(--primary);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 210, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); }
+        }
+
+        .res-label { font-size: 0.9rem; color: var(--primary); opacity: 0.8; }
+        .res-value { font-size: 4rem; font-weight: 800; font-family: 'Montserrat', sans-serif; }
+
+    </style>
+</head>
+<body>
+
+<div class="bg-animate"></div>
+
+<div class="top-nav">
+    <a href="/management" class="admin-link">
+        <span>⚙️</span> ניהול משתמשים (דף 1)
+    </a>
+</div>
+
+<div class="header">
+    <h1>Run-Predictor <span style="font-weight: 300;">AI</span></h1>
+    <p style="opacity: 0.6;">Advanced Performance Analytics Engine</p>
+</div>
+
+<div class="container">
+    <div id="login-section" class="glass-card" style="max-width: 450px; margin: auto;">
+        <h2>System Authentication</h2>
+        <input type="text" id="username" placeholder="USER ID">
+        <input type="password" id="password" placeholder="ACCESS KEY">
+        <button class="btn" onclick="login()">Initialize Session</button>
+    </div>
+
+    <div id="work-section" style="display:none;">
+        <div class="grid">
+            <div class="glass-card">
+                <h2>01. Train Model</h2>
+                <p style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 20px;">הזיני נתוני אימון (X) וזמני ריצה (Y) מופרדים בפסיקים.</p>
+                <input type="text" id="x_hours" placeholder="Hours: 5, 10, 15...">
+                <input type="text" id="y_times" placeholder="Times: 60, 50, 45...">
+                <button class="btn" onclick="trainModel()">Execute Training</button>
+            </div>
+
+            <div class="glass-card">
+                <h2>02. Run Inference</h2>
+                <input type="number" id="predict_hours" placeholder="TARGET TRAINING HOURS">
+                <button class="btn" onclick="predictTime()" style="background: white; color: var(--bg);">Compute Prediction</button>
+
+                <div id="result-box" class="prediction-display">
+                    <div class="res-label">Estimated Completion Time</div>
+                    <div class="res-value" id="prediction-res">0</div>
+                    <div style="font-size: 1.2rem; opacity: 0.8;">Minutes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let authToken = "";
+
+    async function login() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        try {
+            const res = await fetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_name: u, password: p })
+            });
+            if (!res.ok) throw new Error("Authentication Failed");
+            const data = await res.json();
+            authToken = data.access_token;
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('work-section').style.display = 'block';
+        } catch (e) { alert(e.message); }
+    }
+
+    async function trainModel() {
+        const x = document.getElementById('x_hours').value.split(',').map(Number);
+        const y = document.getElementById('y_times').value.split(',').map(Number);
+        try {
+            const res = await fetch('/train', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ x_hours: x, y_times: y, degree: 3 })
+            });
+            if (res.ok) alert("Model Trained Successfully");
+        } catch (e) { alert("Error Training Model"); }
+    }
+
+    async function predictTime() {
+        const h = document.getElementById('predict_hours').value;
+        try {
+            const res = await fetch(`/predict/${h}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail);
+
+            document.getElementById('result-box').style.display = 'block';
+            document.getElementById('prediction-res').innerText = data.predicted_time.toFixed(1);
+        } catch (e) { alert(e.message); }
+    }
+</script>
+</body>
+</html>

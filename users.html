@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ניהול מערכת | Run-Predictor AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&family=Assistant:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; background: #0f172a; color: white; font-family: 'Assistant', sans-serif; text-align: center; }
+        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; margin: 20px auto; max-width: 900px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { color: #00d2ff; text-transform: uppercase; font-size: 0.8rem; padding: 10px; border-bottom: 1px solid #333; }
+        td { padding: 12px; border-bottom: 1px solid #222; font-size: 0.9rem; }
+        .btn-small { background: #3a7bd5; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; margin: 2px; font-size: 0.75rem; transition: 0.3s; }
+        .btn-del { background: #e05050; }
+        .btn-small:hover { opacity: 0.8; transform: translateY(-1px); }
+        .nav-link { color: #00d2ff; text-decoration: none; font-size: 0.8rem; display: inline-block; margin-bottom: 20px; border: 1px solid #00d2ff; padding: 5px 15px; border-radius: 20px; }
+        input.edit-input { background: rgba(0,0,0,0.3); border: 1px solid #444; color: white; padding: 4px; border-radius: 4px; width: 150px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div style="padding: 40px;">
+        <h1 style="font-family: 'Montserrat'; letter-spacing: 2px;">USER MANAGEMENT</h1>
+        <a href="/" class="nav-link">← חזרה למסך החיזוי (דף 2)</a>
+
+        <div class="glass-card">
+            <h2>רשימת משתמשים פעילים</h2>
+            <div id="user-list">טוען נתונים מהשרת...</div>
+            <button class="btn-small" onclick="loadUsers()" style="margin-top: 20px; background: #00d2ff; color: #000; font-weight: 700;">רענן נתונים</button>
+        </div>
+    </div>
+
+    <script>
+        // פונקציית צפייה (View)
+        async function loadUsers() {
+            try {
+                const res = await fetch('/users');
+                const users = await res.json();
+                let html = '<table><tr><th>ID</th><th>שם משתמש</th><th>אימייל (ניתן לעריכה)</th><th>פעולות</th></tr>';
+                users.forEach(u => {
+                    html += `<tr>
+                        <td>${u.id}</td>
+                        <td>${u.user_name}</td>
+                        <td><input type="email" id="email-${u.id}" class="edit-input" value="${u.email}"></td>
+                        <td>
+                            <button class="btn-small" onclick="updateUser(${u.id})">עדכן</button>
+                            <button class="btn-small btn-del" onclick="deleteUser(${u.id})">מחק</button>
+                        </td>
+                    </tr>`;
+                });
+                html += '</table>';
+                document.getElementById('user-list').innerHTML = html;
+            } catch (e) {
+                document.getElementById('user-list').innerHTML = "שגיאה בטעינת המשתמשים.";
+            }
+        }
+
+        // פונקציית עדכון (Update) - דרישת חובה בדף 1
+        async function updateUser(id) {
+            const newEmail = document.getElementById(`email-${id}`).value;
+            const res = await fetch(`/users/${id}?email=${encodeURIComponent(newEmail)}`, { method: 'PUT' });
+            if (res.ok) {
+                alert('הפרטים עודכנו בהצלחה!');
+                loadUsers();
+            } else {
+                alert('שגיאה בעדכון הפרטים.');
+            }
+        }
+
+        // פונקציית מחיקה (Delete)
+        async function deleteUser(id) {
+            if (confirm('בטוח שברצונך למחוק משתמש זה לצמיתות?')) {
+                const res = await fetch(`/users/${id}`, { method: 'DELETE' });
+                if (res.ok) loadUsers();
+            }
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>
